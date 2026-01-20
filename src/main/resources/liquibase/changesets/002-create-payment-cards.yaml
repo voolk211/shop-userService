@@ -48,6 +48,15 @@ databaseChangeLog:
                   defaultValue: true
                   constraints:
                     nullable: false
+              - column:
+                  name: created_at
+                  type: TIMESTAMP
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_at
+                  type: TIMESTAMP
         - createIndex:
             indexName: idx_payment_cards_user_id
             tableName: payment_cards
