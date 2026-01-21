@@ -31,4 +31,9 @@ public class Card extends Auditable {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
+
+    boolean getActive(){
+        return active;
+    }
+
 }
