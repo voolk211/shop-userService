@@ -32,7 +32,7 @@ public class Card extends Auditable {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    boolean getActive(){
+    public boolean getActive(){
         return active;
     }
 

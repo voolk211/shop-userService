@@ -12,20 +12,20 @@ public class UserSpecification {
            if (name == null || name.isBlank()){
                return criteriaBuilder.conjunction();
            }
-           return criteriaBuilder.equal(
+           return criteriaBuilder.like(
                    criteriaBuilder.lower(root.get("name")),
-                   name.toLowerCase());
+                   "%" + name.toLowerCase().trim() + "%");
         };
     }
 
-    public static Specification<User> hasSurname(String name){
+    public static Specification<User> hasSurname(String surname){
         return (root, query, criteriaBuilder) -> {
-            if (name == null || name.isBlank()){
+            if (surname == null || surname.isBlank()){
                 return criteriaBuilder.conjunction();
             }
-            return criteriaBuilder.equal(
+            return criteriaBuilder.like(
                     criteriaBuilder.lower(root.get("surname")),
-                    name.toLowerCase());
+                    "%" + surname.toLowerCase().trim() + "%");
         };
     }
 }

@@ -4,14 +4,18 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.example.shop_userservice.model.Card;
 import org.example.shop_userservice.model.User;
+import org.example.shop_userservice.repository.CardRepository;
 import org.example.shop_userservice.repository.UserRepository;
 import org.example.shop_userservice.service.UserService;
+import org.example.shop_userservice.specification.CardSpecification;
 import org.example.shop_userservice.specification.UserSpecification;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.domain.UpdateSpecification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Set;
@@ -20,28 +24,26 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
-    UserRepository userRepository;
+    private final CardRepository cardRepository;
+    private final UserRepository userRepository;
 
+    @Transactional
     @Override
     public User createUser(User user) {
-        validateCardLimit(user.getCards());
+        if (user.getId() != null && userRepository.existsById(user.getId())){
+            throw new IllegalStateException("User already exists.");
+        }
         userRepository.save(user);
         return user;
     }
 
-
-
-    private void validateCardLimit(List<Card> cards) {
-        if (cards != null && cards.size() > 5) {
-            throw new IllegalArgumentException("A user cannot have more than 5 cards.");
-        }
-    }
-
+    @Transactional(readOnly = true)
     @Override
     public User getUserById(Long id) {
         return userRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("User not found"));
     }
 
+    @Transactional(readOnly = true)
     @Override
     public Page<User> getAllUsers(Pageable pageable, String name, String surname) {
         Specification<User> spec = Specification
@@ -50,11 +52,16 @@ public class UserServiceImpl implements UserService {
         return userRepository.findAll(spec, pageable);
     }
 
+    @Transactional(readOnly = true)
     @Override
-    public Page<Card> getAllCardsByNameAndSurname(Pageable pageable, String name, String surname) {
-        return null;
+    public Page<Card> getAllCardsByUserNameAndSurname(Pageable pageable, String name, String surname) {
+        Specification<Card> spec = Specification
+                .where(CardSpecification.cardUserHasName(name))
+                .and(CardSpecification.cardUserHasSurname(surname));
+        return cardRepository.findAll(spec, pageable);
     }
 
+    @Transactional
     @Override
     public User updateUser(User user) {
         User currentUser = getUserById(user.getId());
@@ -66,21 +73,30 @@ public class UserServiceImpl implements UserService {
         return userRepository.save(currentUser);
     }
 
+    @Transactional
     @Override
     public User activateUser(Long id) {
+        if (!userRepository.existsById(id)) {
+            throw new EntityNotFoundException("User not found");
+        }
         userRepository.setActiveById(id, true);
-        return userRepository.getUserById(id);
+        return getUserById(id);
     }
 
+    @Transactional
     @Override
     public User deactivateUser(Long id) {
+        if (!userRepository.existsById(id)) {
+            throw new EntityNotFoundException("User not found");
+        }
         userRepository.setActiveById(id, false);
-        return userRepository.getUserById(id);
+        return getUserById(id);
     }
 
+    @Transactional(readOnly = true)
     @Override
     public List<Card> getCardsByUserId(Long userId) {
-        User user = userRepository.getUserById(userId);
+        User user = getUserById(userId);
         return user.getCards();
     }
 }

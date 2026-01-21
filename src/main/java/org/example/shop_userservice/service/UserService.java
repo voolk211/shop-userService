@@ -16,7 +16,7 @@ public interface UserService {
 
     Page<User> getAllUsers(Pageable pageable, String name, String surname);
 
-    Page<Card> getAllCardsByNameAndSurname(Pageable pageable, String name, String surname);
+    Page<Card> getAllCardsByUserNameAndSurname(Pageable pageable, String name, String surname);
 
     User updateUser(User user);
 
