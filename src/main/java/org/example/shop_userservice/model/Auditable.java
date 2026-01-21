@@ -1,4 +1,4 @@
-package org.example.shop_userservice.domain;
+package org.example.shop_userservice.model;
 
 
 import jakarta.persistence.Column;
