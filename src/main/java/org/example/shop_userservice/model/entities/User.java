@@ -1,4 +1,4 @@
-package org.example.shop_userservice.model;
+package org.example.shop_userservice.model.entities;
 
 import jakarta.persistence.*;
 import lombok.Data;
@@ -7,7 +7,6 @@ import lombok.EqualsAndHashCode;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 @EqualsAndHashCode(callSuper = true)
 @Entity
@@ -32,13 +31,8 @@ public class User extends Auditable {
     private String email;
 
     @Column(name = "active", nullable = false)
-    private boolean active;
+    private boolean active = true;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Card> cards = new ArrayList<>();
-
-    public boolean getActive(){
-        return active;
-    }
-
 }

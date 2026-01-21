@@ -2,14 +2,11 @@ package org.example.shop_userservice.service.impl;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.example.shop_userservice.model.Card;
-import org.example.shop_userservice.model.User;
+import org.example.shop_userservice.model.entities.Card;
 import org.example.shop_userservice.repository.CardRepository;
 import org.example.shop_userservice.service.CardService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -47,7 +44,7 @@ public class CardServiceImpl implements CardService {
         currentCard.setUser(card.getUser());
         currentCard.setHolder(card.getHolder());
         currentCard.setExpirationDate(card.getExpirationDate());
-        currentCard.setActive(card.getActive());
+        currentCard.setActive(card.isActive());
         return cardRepository.save(currentCard);
     }
 
@@ -70,4 +67,11 @@ public class CardServiceImpl implements CardService {
         cardRepository.setActiveById(id, false);
         return getCardById(id);
     }
+
+    @Transactional
+    @Override
+    public void deleteCard(Long cardId){
+        cardRepository.deleteById(cardId);
+    }
+
 }

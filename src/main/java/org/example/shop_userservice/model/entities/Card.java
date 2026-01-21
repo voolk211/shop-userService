@@ -1,4 +1,4 @@
-package org.example.shop_userservice.model;
+package org.example.shop_userservice.model.entities;
 
 import jakarta.persistence.*;
 import lombok.Data;
@@ -26,14 +26,9 @@ public class Card extends Auditable {
     private LocalDate expirationDate;
 
     @Column(name = "active", nullable = false)
-    private boolean active;
+    private boolean active = true;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
-
-    public boolean getActive(){
-        return active;
-    }
-
 }

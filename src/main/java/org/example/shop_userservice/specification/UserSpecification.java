@@ -1,7 +1,7 @@
 package org.example.shop_userservice.specification;
 
 import lombok.NoArgsConstructor;
-import org.example.shop_userservice.model.User;
+import org.example.shop_userservice.model.entities.User;
 import org.springframework.data.jpa.domain.Specification;
 
 @NoArgsConstructor

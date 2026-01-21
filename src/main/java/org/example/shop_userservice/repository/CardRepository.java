@@ -1,15 +1,12 @@
 package org.example.shop_userservice.repository;
 
 
-import lombok.Lombok;
-import org.example.shop_userservice.model.Card;
+import org.example.shop_userservice.model.entities.Card;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-
-import java.util.List;
 
 public interface CardRepository extends JpaRepository<Card, Long>, JpaSpecificationExecutor<Card> {
 
@@ -19,4 +16,5 @@ public interface CardRepository extends JpaRepository<Card, Long>, JpaSpecificat
 
     Long countByUserId(Long userId);
 
+    Long id(Long id);
 }

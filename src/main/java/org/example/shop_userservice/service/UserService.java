@@ -1,7 +1,7 @@
 package org.example.shop_userservice.service;
 
-import org.example.shop_userservice.model.Card;
-import org.example.shop_userservice.model.User;
+import org.example.shop_userservice.model.entities.Card;
+import org.example.shop_userservice.model.entities.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -25,4 +25,6 @@ public interface UserService {
     User deactivateUser(Long id);
 
     List<Card> getCardsByUserId(Long userId);
+
+    void deleteUser(Long userId);
 }

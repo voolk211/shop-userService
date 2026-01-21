@@ -2,23 +2,20 @@ package org.example.shop_userservice.service.impl;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.example.shop_userservice.model.Card;
-import org.example.shop_userservice.model.User;
+import org.example.shop_userservice.model.entities.Card;
+import org.example.shop_userservice.model.entities.User;
 import org.example.shop_userservice.repository.CardRepository;
 import org.example.shop_userservice.repository.UserRepository;
 import org.example.shop_userservice.service.UserService;
 import org.example.shop_userservice.specification.CardSpecification;
 import org.example.shop_userservice.specification.UserSpecification;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.data.jpa.domain.UpdateSpecification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -69,7 +66,7 @@ public class UserServiceImpl implements UserService {
         currentUser.setSurname(user.getSurname());
         currentUser.setBirthDate(user.getBirthDate());
         currentUser.setEmail(user.getEmail());
-        currentUser.setActive(user.getActive());
+        currentUser.setActive(user.isActive());
         return userRepository.save(currentUser);
     }
 
@@ -98,5 +95,11 @@ public class UserServiceImpl implements UserService {
     public List<Card> getCardsByUserId(Long userId) {
         User user = getUserById(userId);
         return user.getCards();
+    }
+
+    @Transactional
+    @Override
+    public void deleteUser(Long userId){
+        cardRepository.deleteById(userId);
     }
 }

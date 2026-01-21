@@ -1,7 +1,7 @@
 package org.example.shop_userservice.service;
 
-import org.example.shop_userservice.model.Card;
-import org.example.shop_userservice.model.User;
+import org.example.shop_userservice.model.entities.Card;
+import org.springframework.transaction.annotation.Transactional;
 
 public interface CardService {
 
@@ -15,4 +15,5 @@ public interface CardService {
 
     Card deactivateCard(Long id);
 
+    void deleteCard(Long cardId);
 }
