@@ -1,6 +1,5 @@
 package org.example.shop_userservice.service.impl;
 
-import jakarta.annotation.PostConstruct;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.example.shop_userservice.model.entities.Card;
@@ -20,11 +19,6 @@ public class CardServiceImpl implements CardService {
 
     private final CardRepository cardRepository;
     private final CacheManager cacheManager;
-
-    @PostConstruct
-    void test(CacheManager cacheManager) {
-        System.out.println(cacheManager.getClass());
-    }
 
     @Transactional
     @Override

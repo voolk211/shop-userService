@@ -8,9 +8,9 @@ import java.io.Serializable;
 import java.time.LocalDate;
 
 @EqualsAndHashCode(callSuper = true)
-@Data
 @Table(name = "payment_cards")
 @Entity
+@Data
 public class Card extends Auditable implements Serializable {
 
     @Id
