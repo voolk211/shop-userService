@@ -4,13 +4,14 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
 @Table(name = "payment_cards")
 @Entity
-public class Card extends Auditable {
+public class Card extends Auditable implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
