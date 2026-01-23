@@ -42,7 +42,7 @@ public class UserServiceImpl implements UserService {
 
     @Transactional(readOnly = true)
     @Override
-    public Page<User> getAllUsers(Pageable pageable, String name, String surname) {
+    public Page<User> getAllUsersByNameAndSurname(Pageable pageable, String name, String surname) {
         Specification<User> spec = Specification
                 .where(UserSpecification.hasName(name))
                 .and(UserSpecification.hasSurname(surname));

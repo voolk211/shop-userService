@@ -12,6 +12,9 @@ import java.time.LocalDate;
 
 @Data
 public class CardDto {
+
+        private Long id;
+
         @NotNull(message = "Card number must not be null")
         @Pattern(regexp = "\\d{13,19}", message = "Number length must contain 13 to 19 characters")
         private String number;
@@ -25,4 +28,5 @@ public class CardDto {
 
         @NotNull(message = "User ID must not be null")
         private Long userId;
+
 }

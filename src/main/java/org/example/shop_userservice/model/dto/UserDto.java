@@ -13,6 +13,8 @@ import org.hibernate.validator.constraints.Length;
 @Data
 public class UserDto {
 
+    private Long id;
+
     @NotNull(message = "Name must not be null")
     @Length(max = 255, message = "Name length must not exceed 255 characters")
     private String name;
@@ -29,4 +31,5 @@ public class UserDto {
     @Length(max = 255, message = "Email length must not exceed 255 characters")
     @Email
     private String email;
+
 }

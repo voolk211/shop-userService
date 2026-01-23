@@ -1,17 +1,19 @@
 package org.example.shop_userservice.model.entities;
 
 import jakarta.persistence.*;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.*;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
-@EqualsAndHashCode(callSuper = true)
 @Entity
 @Table(name = "users")
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class User extends Auditable {
 
     @Id
@@ -35,4 +37,21 @@ public class User extends Auditable {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Card> cards = new ArrayList<>();
+
+    @Override
+    public boolean equals(Object o){
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof User user)) {
+            return false;
+        }
+        return Objects.equals(id, user.id);
+    }
+
+    @Override
+    public int hashCode(){
+        return Objects.hash(id);
+    }
+
 }

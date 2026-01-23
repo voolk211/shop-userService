@@ -1,15 +1,17 @@
 package org.example.shop_userservice.model.entities;
 
 import jakarta.persistence.*;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.*;
 
 import java.time.LocalDate;
+import java.util.Objects;
 
-@EqualsAndHashCode(callSuper = true)
-@Data
 @Table(name = "payment_cards")
 @Entity
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class Card extends Auditable {
 
     @Id
@@ -31,4 +33,20 @@ public class Card extends Auditable {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
+
+    @Override
+    public boolean equals(Object o ){
+        if (this == o) {
+            return true;
+        }
+        if(!(o instanceof Card card)) {
+            return false;
+        }
+        return Objects.equals(id, card.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
 }

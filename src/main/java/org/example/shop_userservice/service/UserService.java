@@ -14,7 +14,7 @@ public interface UserService {
 
     User getUserById(Long id);
 
-    Page<User> getAllUsers(Pageable pageable, String name, String surname);
+    Page<User> getAllUsersByNameAndSurname(Pageable pageable, String name, String surname);
 
     Page<Card> getAllCardsByUserNameAndSurname(Pageable pageable, String name, String surname);
 
