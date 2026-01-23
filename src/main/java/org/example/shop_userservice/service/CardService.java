@@ -11,9 +11,7 @@ public interface CardService {
 
     Card updateCard(Card card);
 
-    Card activateCard(Long id);
-
-    Card deactivateCard(Long id);
+    Card patchCard(Long id, Boolean active);
 
     void deleteCard(Long cardId);
 }

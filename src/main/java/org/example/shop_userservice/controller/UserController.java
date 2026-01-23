@@ -8,6 +8,7 @@ import org.example.shop_userservice.model.entities.Card;
 import org.example.shop_userservice.model.entities.User;
 import org.example.shop_userservice.model.mappers.CardMapper;
 import org.example.shop_userservice.model.mappers.UserMapper;
+import org.example.shop_userservice.model.patchDto.UserPatchDto;
 import org.example.shop_userservice.service.UserService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -58,17 +59,10 @@ public class UserController {
         return ResponseEntity.ok(cardMapper.toDto(cards));
     }
 
-    @PostMapping("/{id}/activate")
-    public ResponseEntity<UserDto> activateUser(@PathVariable Long id) {
-        User user = userService.activateUser(id);
+    @PatchMapping("/{id}")
+    public ResponseEntity<UserDto> patchUser(@Valid @RequestBody UserPatchDto userPatchDto, @PathVariable Long id) {
+        User user = userService.patchUser(id, userPatchDto.getActive());
         return ResponseEntity.ok(userMapper.toDto(user));
-    }
-
-    @PostMapping("/{id}/deactivate")
-    public ResponseEntity<UserDto> deactivateUser(@PathVariable Long id) {
-        User user = userService.deactivateUser(id);
-        return ResponseEntity.ok(userMapper.toDto(user));
-
     }
 
     @GetMapping

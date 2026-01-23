@@ -2,7 +2,9 @@ package org.example.shop_userservice.service.impl;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.example.shop_userservice.exception.ResourceNotFoundException;
 import org.example.shop_userservice.model.entities.Card;
+import org.example.shop_userservice.model.entities.User;
 import org.example.shop_userservice.repository.CardRepository;
 import org.example.shop_userservice.service.CardService;
 import org.springframework.stereotype.Service;
@@ -34,38 +36,36 @@ public class CardServiceImpl implements CardService {
     @Transactional(readOnly = true)
     @Override
     public Card getCardById(Long id) {
-        return cardRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Card not found"));
+        return cardRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Card not found"));
     }
 
     @Transactional
     @Override
     public Card updateCard(Card card) {
-        Card currentCard = getCardById(card.getId());
-        currentCard.setUser(card.getUser());
-        currentCard.setHolder(card.getHolder());
-        currentCard.setExpirationDate(card.getExpirationDate());
-        currentCard.setActive(card.isActive());
+        Card currentCard = cardRepository.findById(card.getId()).orElseThrow(() -> new ResourceNotFoundException("Card not found"));
+        if (card.getUser()!=null){
+            currentCard.setUser(card.getUser());
+        }
+        if (card.getHolder()!=null){
+            currentCard.setHolder(card.getHolder());
+        }
+        if (card.getExpirationDate()!=null){
+            currentCard.setExpirationDate(card.getExpirationDate());
+        }
+        if (card.getActive()!=null){
+            currentCard.setActive(card.getActive());
+        }
         return cardRepository.save(currentCard);
     }
 
     @Transactional
     @Override
-    public Card activateCard(Long id) {
+    public Card patchCard(Long id, Boolean active) {
         if (!cardRepository.existsById(id)) {
-            throw new EntityNotFoundException("Card not found");
+            throw new ResourceNotFoundException("Card not found");
         }
-        cardRepository.setActiveById(id, true);
-        return getCardById(id);
-    }
-
-    @Transactional
-    @Override
-    public Card deactivateCard(Long id) {
-        if (!cardRepository.existsById(id)) {
-            throw new EntityNotFoundException("Card not found");
-        }
-        cardRepository.setActiveById(id, false);
-        return getCardById(id);
+        cardRepository.setActiveById(id, active);
+        return cardRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Card not found"));
     }
 
     @Transactional

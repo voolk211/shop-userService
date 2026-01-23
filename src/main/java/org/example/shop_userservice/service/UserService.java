@@ -20,9 +20,7 @@ public interface UserService {
 
     User updateUser(User user);
 
-    User activateUser(Long id);
-
-    User deactivateUser(Long id);
+    User patchUser(Long id, Boolean active);
 
     List<Card> getCardsByUserId(Long userId);
 

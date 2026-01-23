@@ -2,6 +2,7 @@ package org.example.shop_userservice.service.impl;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.example.shop_userservice.exception.ResourceNotFoundException;
 import org.example.shop_userservice.model.entities.Card;
 import org.example.shop_userservice.model.entities.User;
 import org.example.shop_userservice.repository.CardRepository;
@@ -30,6 +31,9 @@ public class UserServiceImpl implements UserService {
         if (user.getId() != null && userRepository.existsById(user.getId())){
             throw new IllegalStateException("User already exists.");
         }
+        if (user.getEmail() != null && userRepository.existsByEmail(user.getEmail())){
+            throw new IllegalStateException("Email already in use");
+        }
         userRepository.save(user);
         return user;
     }
@@ -37,7 +41,7 @@ public class UserServiceImpl implements UserService {
     @Transactional(readOnly = true)
     @Override
     public User getUserById(Long id) {
-        return userRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("User not found"));
+        return userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User not found"));
     }
 
     @Transactional(readOnly = true)
@@ -61,39 +65,45 @@ public class UserServiceImpl implements UserService {
     @Transactional
     @Override
     public User updateUser(User user) {
-        User currentUser = getUserById(user.getId());
-        currentUser.setName(user.getName());
-        currentUser.setSurname(user.getSurname());
-        currentUser.setBirthDate(user.getBirthDate());
-        currentUser.setEmail(user.getEmail());
-        currentUser.setActive(user.isActive());
+        User currentUser = userRepository.findById(user.getId()).orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        if (user.getEmail() != null && userRepository.existsByEmail(user.getEmail()) && !(currentUser.getEmail().equals(user.getEmail()))){
+            throw new IllegalStateException("Email already in use");
+        }
+        if (user.getEmail()!=null){
+            currentUser.setEmail(user.getEmail());
+        }
+        if (user.getName()!=null){
+            currentUser.setName(user.getName());
+        }
+        if (user.getSurname()!=null){
+            currentUser.setSurname(user.getSurname());
+        }
+        if (user.getSurname()!=null){
+            currentUser.setSurname(user.getSurname());
+        }
+        if (user.getBirthDate()!=null){
+            currentUser.setBirthDate(user.getBirthDate());
+        }
+        if (user.getActive()!=null){
+            currentUser.setActive(user.getActive());
+        }
         return userRepository.save(currentUser);
     }
 
     @Transactional
     @Override
-    public User activateUser(Long id) {
+    public User patchUser(Long id, Boolean active) {
         if (!userRepository.existsById(id)) {
-            throw new EntityNotFoundException("User not found");
+            throw new ResourceNotFoundException("User not found");
         }
-        userRepository.setActiveById(id, true);
-        return getUserById(id);
-    }
-
-    @Transactional
-    @Override
-    public User deactivateUser(Long id) {
-        if (!userRepository.existsById(id)) {
-            throw new EntityNotFoundException("User not found");
-        }
-        userRepository.setActiveById(id, false);
-        return getUserById(id);
+        userRepository.setActiveById(id, active);
+        return userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User not found"));
     }
 
     @Transactional(readOnly = true)
     @Override
     public List<Card> getCardsByUserId(Long userId) {
-        User user = getUserById(userId);
+        User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User not found"));;
         return user.getCards();
     }
 

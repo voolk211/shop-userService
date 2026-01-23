@@ -8,6 +8,8 @@ import org.example.shop_userservice.model.entities.Card;
 import org.example.shop_userservice.model.entities.User;
 import org.example.shop_userservice.model.mappers.CardMapper;
 import org.example.shop_userservice.model.mappers.UserMapper;
+import org.example.shop_userservice.model.patchDto.CardPatchDto;
+import org.example.shop_userservice.model.patchDto.UserPatchDto;
 import org.example.shop_userservice.service.CardService;
 import org.example.shop_userservice.service.UserService;
 import org.springframework.data.domain.Page;
@@ -48,15 +50,9 @@ public class CardController {
         return ResponseEntity.ok(cardMapper.toDto(card));
     }
 
-    @PostMapping("/{id}/activate")
-    public ResponseEntity<CardDto> activateCard(@PathVariable Long id) {
-        Card card = cardService.activateCard(id);
-        return ResponseEntity.ok(cardMapper.toDto(card));
-    }
-
-    @PostMapping("/{id}/deactivate")
-    public ResponseEntity<CardDto> deactivateCard(@PathVariable Long id) {
-        Card card = cardService.deactivateCard(id);
+    @PatchMapping("/{id}")
+    public ResponseEntity<CardDto> patchCard(@Valid @RequestBody CardPatchDto cardPatchDto, @PathVariable Long id) {
+        Card card = cardService.patchCard(id, cardPatchDto.getActive());
         return ResponseEntity.ok(cardMapper.toDto(card));
     }
 

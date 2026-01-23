@@ -7,6 +7,7 @@ import lombok.Data;
 import org.example.shop_userservice.model.entities.Auditable;
 import org.example.shop_userservice.model.entities.User;
 import org.hibernate.validator.constraints.Length;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
 
@@ -24,6 +25,7 @@ public class CardDto {
         private String holder;
 
         @NotNull(message = "Expiration date must not be null")
+        @DateTimeFormat
         private LocalDate expirationDate;
 
         @NotNull(message = "User ID must not be null")

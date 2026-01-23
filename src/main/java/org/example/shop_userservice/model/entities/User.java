@@ -33,7 +33,7 @@ public class User extends Auditable {
     private String email;
 
     @Column(name = "active", nullable = false)
-    private boolean active = true;
+    private Boolean active = true;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Card> cards = new ArrayList<>();
