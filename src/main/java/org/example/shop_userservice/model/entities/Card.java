@@ -28,7 +28,7 @@ public class Card extends Auditable {
     private LocalDate expirationDate;
 
     @Column(name = "active", nullable = false)
-    private Boolean active = true;
+    private boolean active = true;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
