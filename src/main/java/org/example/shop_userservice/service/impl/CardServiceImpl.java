@@ -2,6 +2,7 @@ package org.example.shop_userservice.service.impl;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.example.shop_userservice.exception.CardLimitException;
 import org.example.shop_userservice.exception.ResourceNotFoundException;
 import org.example.shop_userservice.model.entities.Card;
 import org.example.shop_userservice.model.entities.User;
@@ -36,7 +37,7 @@ public class CardServiceImpl implements CardService {
     private void validateCardLimit(Long userId) {
         Long cardCount = cardRepository.countByUserId(userId);
         if (cardCount != null && cardCount >= 5) {
-            throw new IllegalArgumentException("A user cannot have more than 5 cards.");
+            throw new CardLimitException("A user cannot have more than 5 cards.");
         }
     }
 
