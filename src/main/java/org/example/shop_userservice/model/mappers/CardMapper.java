@@ -20,7 +20,7 @@ public interface CardMapper {
         card.setExpirationDate(cardDto.getExpirationDate());
 
         User user = new User();
-        user.setId(cardDto.getUserId()); // ← ONLY set ID
+        user.setId(cardDto.getUserId());
         card.setUser(user);
         return card;
     }
@@ -32,7 +32,9 @@ public interface CardMapper {
     List<CardDto> toDto(List<Card> cards);
 
     @Mapping(target = "userId", source = "user.id")
-    Page<CardDto> toDto(Page<Card> cards);
+    default Page<CardDto> toDto(Page<Card> cards){
+        return cards.map(this::toDto);
+    }
 
 }
 

@@ -2,6 +2,7 @@ package org.example.shop_userservice.model.dto;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
+import jdk.jfr.BooleanFlag;
 import lombok.Data;
 import org.example.shop_userservice.model.entities.Card;
 import jakarta.validation.constraints.NotNull;
@@ -26,10 +27,12 @@ public class UserDto {
     @NotNull(message = "BirthDate must not be null")
     private LocalDate birthDate;
 
-
     @NotNull(message = "Email must not be null")
     @Length(max = 255, message = "Email length must not exceed 255 characters")
     @Email
     private String email;
+
+    @NotNull(message = "Active must not be null")
+    private Boolean active;
 
 }

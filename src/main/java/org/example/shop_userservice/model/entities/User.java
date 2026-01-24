@@ -14,7 +14,6 @@ import java.util.Objects;
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
 public class User extends Auditable implements Serializable {
 
     @Id
@@ -34,10 +33,18 @@ public class User extends Auditable implements Serializable {
     private String email;
 
     @Column(name = "active", nullable = false)
-    private Boolean active = true;
+    private Boolean active;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Card> cards = new ArrayList<>();
+
+    public User(String name, String surname, LocalDate birthDate, String email, Boolean active) {
+        this.name = name;
+        this.surname = surname;
+        this.birthDate = birthDate;
+        this.email = email;
+        this.active = active != null ? active : true;
+    }
 
     @Override
     public boolean equals(Object o){

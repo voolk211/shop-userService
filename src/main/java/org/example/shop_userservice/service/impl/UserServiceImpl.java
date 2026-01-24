@@ -19,6 +19,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -31,6 +32,7 @@ public class UserServiceImpl implements UserService {
     @Transactional
     @Override
     public User createUser(User user) {
+
         if (user.getId() != null && userRepository.existsById(user.getId())){
             throw new IllegalStateException("User already exists.");
         }
@@ -45,7 +47,7 @@ public class UserServiceImpl implements UserService {
     @Override
     @Cacheable(value = "UserService::getUserById", key = "#id")
     public User getUserById(Long id) {
-        return userRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("User not found"));
+        return userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User not found"));
     }
 
     @Transactional(readOnly = true)

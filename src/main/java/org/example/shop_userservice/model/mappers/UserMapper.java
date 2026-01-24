@@ -14,8 +14,6 @@ public interface UserMapper {
     UserDto toDto(User user);
 
     default Page<UserDto> toDto(Page<User> users){
-        users.stream()
-                .map(this::toDto)
-                .collect();
+        return users.map(this::toDto);
     }
 }
