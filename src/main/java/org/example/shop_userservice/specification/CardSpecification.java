@@ -14,7 +14,7 @@ public class CardSpecification {
             }
             var userJoin = root.join("user");
             return criteriaBuilder.like(
-                    criteriaBuilder.lower(userJoin.get("surname")),
+                    criteriaBuilder.lower(userJoin.get("name")),
                     "%" + name.toLowerCase().trim() + "%");
         };
     }

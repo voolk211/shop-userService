@@ -31,4 +31,7 @@ public class CardDto {
         @NotNull(message = "User ID must not be null")
         private Long userId;
 
+        @NotNull(message = "Active must not be null")
+        private Boolean active;
+
 }

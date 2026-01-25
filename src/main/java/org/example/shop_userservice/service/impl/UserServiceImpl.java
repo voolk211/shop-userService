@@ -31,6 +31,7 @@ public class UserServiceImpl implements UserService {
 
     @Transactional
     @Override
+    @CacheEvict(value = "UserService::getUserById", key = "#result.id", condition = "#result != null")
     public User createUser(User user) {
 
         if (user.getId() != null && userRepository.existsById(user.getId())){
@@ -39,8 +40,7 @@ public class UserServiceImpl implements UserService {
         if (user.getEmail() != null && userRepository.existsByEmail(user.getEmail())){
             throw new IllegalStateException("Email already in use");
         }
-        userRepository.save(user);
-        return user;
+        return userRepository.save(user);
     }
 
     @Transactional(readOnly = true)
@@ -81,9 +81,6 @@ public class UserServiceImpl implements UserService {
         }
         if (user.getName()!=null){
             currentUser.setName(user.getName());
-        }
-        if (user.getSurname()!=null){
-            currentUser.setSurname(user.getSurname());
         }
         if (user.getSurname()!=null){
             currentUser.setSurname(user.getSurname());

@@ -20,7 +20,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/card")
+@RequestMapping("/api/cards")
 @RequiredArgsConstructor
 public class CardController {
     private final UserService userService;

@@ -18,6 +18,7 @@ public interface CardMapper {
         card.setNumber(cardDto.getNumber());
         card.setHolder(cardDto.getHolder());
         card.setExpirationDate(cardDto.getExpirationDate());
+        card.setActive(cardDto.getActive());
 
         User user = new User();
         user.setId(cardDto.getUserId());

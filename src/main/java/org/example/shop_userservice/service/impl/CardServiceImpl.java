@@ -7,6 +7,7 @@ import org.example.shop_userservice.exception.ResourceNotFoundException;
 import org.example.shop_userservice.model.entities.Card;
 import org.example.shop_userservice.model.entities.User;
 import org.example.shop_userservice.repository.CardRepository;
+import org.example.shop_userservice.repository.UserRepository;
 import org.example.shop_userservice.service.CardService;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
@@ -21,12 +22,16 @@ import org.springframework.transaction.annotation.Transactional;
 public class CardServiceImpl implements CardService {
 
     private final CardRepository cardRepository;
+    private final UserRepository userRepository;
     private final CacheManager cacheManager;
 
     @Transactional
     @Override
     @CacheEvict(value = "UserService::getCardsByUserId", key = "#card.user.id")
     public Card createCard(Card card) {
+        if (!userRepository.existsById(card.getUser().getId())){
+            throw new IllegalStateException("User not exists");
+        }
         if (card.getId()!=null && cardRepository.existsById(card.getId())) {
             throw new IllegalStateException("Card already exists.");
         }
