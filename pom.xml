@@ -174,10 +174,10 @@
                 <version>0.8.12</version>
                 <configuration>
                     <excludes>
-                        <exclude>**/model/dto/**</exclude>
-                        <exclude>**/model/entities/**</exclude>
-                        <exclude>**/model/patchDto/**</exclude>
-                        <exclude>**/model/mappers/**</exclude>
+                        <exclude>**/model/entities/*.java</exclude>
+                        <exclude>**/model/mappers/*.java</exclude>
+                        <exclude>**/exception/ExceptionBody.java</exclude>
+                        <exclude>**/*Application.java</exclude>
                     </excludes>
                 </configuration>
                 <executions>
