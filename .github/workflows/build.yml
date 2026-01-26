@@ -33,6 +33,10 @@ jobs:
           path: ~/.m2
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
           restore-keys: ${{ runner.os }}-m2
+      - name: Setup Testcontainers
+        run: |
+            echo "TESTCONTAINERS_RYUK_DISABLED=true" >> $GITHUB_ENV
+            echo "DOCKER_HOST=unix:///var/run/docker.sock" >> $GITHUB_ENV
       - name: Build, test and run SonarCloud analysis
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
