@@ -6,6 +6,7 @@ import org.example.shop_userservice.exception.ResourceNotFoundException;
 import org.example.shop_userservice.model.entities.Card;
 import org.example.shop_userservice.model.entities.User;
 import org.example.shop_userservice.repository.CardRepository;
+import org.example.shop_userservice.repository.UserRepository;
 import org.example.shop_userservice.service.CardService;
 import org.example.shop_userservice.service.impl.CardServiceImpl;
 import org.junit.jupiter.api.Test;
@@ -32,6 +33,9 @@ public class CardServiceTest {
     @Mock
     CardRepository cardRepository;
 
+    @Mock
+    UserRepository userRepository;
+
     @InjectMocks
     CardServiceImpl cardService;
 
@@ -54,6 +58,7 @@ public class CardServiceTest {
         card.setUser(user);
 
         when(cardRepository.countByUserId(userId)).thenReturn(3L);
+        when(userRepository.existsById(user.getId())).thenReturn(true);
         when(cardRepository.save(any(Card.class))).thenAnswer(invocation -> {
             Card c = invocation.getArgument(0);
             c.setId(1L);
@@ -85,6 +90,7 @@ public class CardServiceTest {
         existingCard.setId(cardId);
         existingCard.setUser(user);
 
+        when(userRepository.existsById(user.getId())).thenReturn(true);
         when(cardRepository.existsById(cardId)).thenReturn(true);
 
         assertThatThrownBy(() -> cardService.createCard(existingCard))
@@ -92,6 +98,29 @@ public class CardServiceTest {
                 .hasMessage("Card already exists.");
 
         verify(cardRepository).existsById(cardId);
+        verify(cardRepository, never()).countByUserId(any());
+        verify(cardRepository, never()).save(any(Card.class));
+    }
+
+    @Test
+    void createCard_WhenUserNotExists_ShouldThrowCardLimitException() {
+        Long cardId = 100L;
+        Long userId = 1L;
+
+        User user = new User();
+        user.setId(userId);
+
+        Card existingCard = new Card();
+        existingCard.setId(cardId);
+        existingCard.setUser(user);
+
+        when(userRepository.existsById(user.getId())).thenReturn(false);
+
+        assertThatThrownBy(() -> cardService.createCard(existingCard))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessage("User not exists");
+
+        verify(userRepository).existsById(user.getId());
         verify(cardRepository, never()).countByUserId(any());
         verify(cardRepository, never()).save(any(Card.class));
     }
@@ -105,6 +134,7 @@ public class CardServiceTest {
         Card newCard = new Card();
         newCard.setUser(user);
 
+        when(userRepository.existsById(user.getId())).thenReturn(true);
         when(cardRepository.countByUserId(userId)).thenReturn(5L);
 
         assertThatThrownBy(() -> cardService.createCard(newCard))

@@ -6,7 +6,7 @@
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
         <version>3.2.5</version>
-        <relativePath/> <!-- lookup parent from repository -->
+        <relativePath/>
     </parent>
     <groupId>org.example</groupId>
     <artifactId>Shop_UserService</artifactId>
@@ -27,11 +27,14 @@
         <url/>
     </scm>
     <properties>
+        <sonar.organization>voolk211</sonar.organization>
+        <sonar.host.url>https://sonarcloud.io</sonar.host.url>
         <java.version>21</java.version>
         <lombok.version>1.18.32</lombok.version>
         <postgresql.version>42.7.3</postgresql.version>
         <mapstruct.version>1.5.5.Final</mapstruct.version>
         <liquibase.version>4.27.0</liquibase.version>
+        <springdoc.version>2.5.0</springdoc.version>
     </properties>
     <dependencies>
 
@@ -154,10 +157,22 @@
                 <version>1.19.8</version>
                 <scope>test</scope>
             </dependency>
+
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+            <version>${springdoc.version}</version>
+        </dependency>
+
     </dependencies>
 
     <build>
         <plugins>
+            <plugin>
+                <groupId>org.sonarsource.scanner.maven</groupId>
+                <artifactId>sonar-maven-plugin</artifactId>
+                <version>3.10.0.2594</version>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -166,6 +181,7 @@
                         <path>
                             <groupId>org.springframework.boot</groupId>
                             <artifactId>spring-boot-configuration-processor</artifactId>
+                            <version>3.2.5</version>
                         </path>
                         <path>
                             <groupId>org.projectlombok</groupId>

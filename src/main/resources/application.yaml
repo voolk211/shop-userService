@@ -16,3 +16,4 @@ spring:
       timeout: 2000ms
   cache:
     type: redis
+

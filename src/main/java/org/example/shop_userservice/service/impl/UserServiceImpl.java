@@ -2,6 +2,7 @@ package org.example.shop_userservice.service.impl;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.example.shop_userservice.exception.ResourceNotFoundException;
 import org.example.shop_userservice.model.entities.Card;
 import org.example.shop_userservice.model.entities.User;
@@ -21,13 +22,14 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
-
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
     private final CardRepository cardRepository;
     private final UserRepository userRepository;
+
 
     @Transactional
     @Override
