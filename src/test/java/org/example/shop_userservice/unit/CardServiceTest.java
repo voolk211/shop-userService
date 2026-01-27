@@ -1,13 +1,13 @@
 package org.example.shop_userservice.unit;
 
 import jakarta.persistence.EntityNotFoundException;
+import org.assertj.core.api.Assertions;
 import org.example.shop_userservice.exception.CardLimitException;
 import org.example.shop_userservice.exception.ResourceNotFoundException;
 import org.example.shop_userservice.model.entities.Card;
 import org.example.shop_userservice.model.entities.User;
 import org.example.shop_userservice.repository.CardRepository;
 import org.example.shop_userservice.repository.UserRepository;
-import org.example.shop_userservice.service.CardService;
 import org.example.shop_userservice.service.impl.CardServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -17,12 +17,16 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 
+
 import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.mockito.Mockito.*;
+import static org.assertj.core.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
 public class CardServiceTest {
@@ -49,6 +53,7 @@ public class CardServiceTest {
 
         User user = new User();
         user.setId(userId);
+        user.setEmail("boba@example.com");
 
         Card card = new Card();
         card.setNumber(number);
@@ -56,6 +61,46 @@ public class CardServiceTest {
         card.setExpirationDate(expirationDate);
         card.setActive(active);
         card.setUser(user);
+
+        assertThat(card.getNumber()).isEqualTo(number);
+        assertThat(card.getHolder()).isEqualTo(holder);
+        assertThat(card.getExpirationDate()).isEqualTo(expirationDate);
+        assertThat(card.getActive()).isEqualTo(active);
+        assertThat(card.getUser().getId()).isEqualTo(userId);
+        assertThat(card.getUser().getEmail()).isEqualTo("boba@example.com");
+
+        User sameUser = new User();
+        sameUser.setId(2L);
+        sameUser.setEmail("boba@example.com");
+
+        Card sameCard = new Card();
+        sameCard.setNumber(number);
+        sameCard.setExpirationDate(expirationDate);
+        sameCard.setUser(sameUser);
+
+        User differentUser = new User();
+        differentUser.setEmail("alice@test.com");
+
+        Card differentCard = new Card();
+        differentCard.setNumber("9999999999999999");
+        differentCard.setExpirationDate(LocalDate.of(2030, 12, 31));
+        differentCard.setUser(differentUser);
+
+        assertThat(card).isEqualTo(sameCard);
+        assertThat(card.hashCode()).isEqualTo(sameCard.hashCode());
+
+        assertThat(card).isNotEqualTo(differentCard);
+        assertThat(card).isNotEqualTo(null);
+        assertThat(card).isNotEqualTo(new Object());
+
+        Set<Card> cardSet = new HashSet<>();
+        cardSet.add(card);
+        cardSet.add(sameCard);
+        Assertions.assertThat(cardSet).hasSize(1);
+
+        cardSet.add(differentCard);
+        Assertions.assertThat(cardSet).hasSize(2);
+
 
         when(cardRepository.countByUserId(userId)).thenReturn(3L);
         when(userRepository.existsById(user.getId())).thenReturn(true);

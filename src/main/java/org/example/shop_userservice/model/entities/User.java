@@ -47,19 +47,14 @@ public class User extends Auditable implements Serializable {
     }
 
     @Override
-    public boolean equals(Object o){
-        if (this == o) {
-            return true;
-        }
-        if (!(o instanceof User user)) {
-            return false;
-        }
-        return Objects.equals(id, user.id);
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof User user)) return false;
+        return Objects.equals(email, user.email);
     }
 
     @Override
-    public int hashCode(){
-        return Objects.hash(id);
+    public int hashCode() {
+        return Objects.hash(email);
     }
-
 }

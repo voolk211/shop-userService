@@ -25,9 +25,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static org.mockito.Mockito.when;
 
@@ -59,6 +57,29 @@ public class UserServiceTest {
         });
 
         User testUser = new User(name, surname, birthDate, email, active);
+        assertThat(testUser.getName()).isEqualTo(name);
+        assertThat(testUser.getSurname()).isEqualTo(surname);
+        assertThat(testUser.getBirthDate()).isEqualTo(birthDate);
+        assertThat(testUser.getEmail()).isEqualTo(email);
+        assertThat(testUser.getActive()).isEqualTo(active);
+
+        User sameUser = new User(name, surname, birthDate, email, active);
+        User differentUser = new User("Alice", "Smith", birthDate, "alice@test.com", false);
+
+        assertThat(testUser).isEqualTo(sameUser);
+        assertThat(testUser.hashCode()).isEqualTo(sameUser.hashCode());
+
+        assertThat(testUser).isNotEqualTo(differentUser);
+        assertThat(testUser).isNotEqualTo(null);
+        assertThat(testUser).isNotEqualTo(new Object());
+
+        Set<User> userSet = new HashSet<>();
+        userSet.add(testUser);
+        userSet.add(sameUser);
+        assertThat(userSet).hasSize(1);
+
+        userSet.add(differentUser);
+        assertThat(userSet).hasSize(2);
 
         User result = userService.createUser(testUser);
 

@@ -36,18 +36,25 @@ public class Card extends Auditable implements Serializable {
     private User user;
 
     @Override
-    public boolean equals(Object o ){
-        if (this == o) {
-            return true;
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Card card)) return false;
+
+        if (!Objects.equals(number, card.number)) return false;
+        if (!Objects.equals(expirationDate, card.expirationDate)) return false;
+
+        if (user == null || card.user == null) {
+            return user == card.user;
         }
-        if(!(o instanceof Card card)) {
-            return false;
-        }
-        return Objects.equals(id, card.id);
+        return Objects.equals(user.getEmail(), card.user.getEmail());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id);
+        return Objects.hash(
+                number,
+                expirationDate,
+                user != null ? user.getEmail() : null
+        );
     }
 }

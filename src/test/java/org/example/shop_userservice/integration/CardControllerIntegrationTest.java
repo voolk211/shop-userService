@@ -2,6 +2,8 @@ package org.example.shop_userservice.integration;
 
 import org.example.shop_userservice.model.dto.CardDto;
 import org.example.shop_userservice.model.dto.UserDto;
+import org.example.shop_userservice.model.entities.Card;
+import org.example.shop_userservice.model.mappers.CardMapper;
 import org.example.shop_userservice.model.patchDto.CardPatchDto;
 import org.example.shop_userservice.model.patchDto.UserPatchDto;
 import org.junit.jupiter.api.Test;
