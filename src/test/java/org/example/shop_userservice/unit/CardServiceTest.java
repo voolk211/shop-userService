@@ -6,11 +6,13 @@ import org.example.shop_userservice.exception.CardLimitException;
 import org.example.shop_userservice.exception.ResourceNotFoundException;
 import org.example.shop_userservice.model.entities.Card;
 import org.example.shop_userservice.model.entities.User;
+import org.example.shop_userservice.model.mappers.CardMapper;
 import org.example.shop_userservice.repository.CardRepository;
 import org.example.shop_userservice.repository.UserRepository;
 import org.example.shop_userservice.service.impl.CardServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mapstruct.factory.Mappers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -50,6 +52,8 @@ public class CardServiceTest {
         String holder = "Bob";
         LocalDate expirationDate = LocalDate.now();
         Boolean active = true;
+
+        CardMapper mapper = Mappers.getMapper(CardMapper.class);
 
         User user = new User();
         user.setId(userId);

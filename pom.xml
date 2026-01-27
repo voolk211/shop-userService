@@ -175,6 +175,9 @@
                 <configuration>
                     <excludes>
                         <exclude>**/model/**</exclude>
+                        <exclude>**/model/dto/**</exclude>
+                        <exclude>**/model/entities/**</exclude>
+                        <exclude>**/model/mappers/**</exclude>
                         <exclude>**/config/**</exclude>
                         <exclude>**/exception/**</exclude>
                         <exclude>**/*Application.java</exclude>
