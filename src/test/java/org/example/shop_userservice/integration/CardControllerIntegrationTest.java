@@ -217,17 +217,96 @@ public class CardControllerIntegrationTest extends AbstractIntegrationTest {
         card.setExpirationDate(LocalDate.of(2030, 1, 1));
         card.setActive(true);
 
-        String responseCard = mockMvc.perform(post("/api/cards")
+        mockMvc.perform(post("/api/cards")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(card)))
+                .andExpect(status().isCreated());
+
+        mockMvc.perform(get("/api/cards")
+                        .param("name", created.getName())
+                        .param("surname", created.getSurname())
+                        .param("page", "0")
+                        .param("size", "10"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content").isArray())
+                .andExpect(jsonPath("$.totalElements").value(1));
+    }
+
+    @Test
+    @WithMockUser(roles = "USER")
+    void getAllCardsByUserName_returnsPage() throws Exception {
+
+        UserDto requestUser = new UserDto();
+        requestUser.setName("Tate");
+        requestUser.setSurname("McRae");
+        requestUser.setBirthDate(LocalDate.of(2000, 1, 1));
+        requestUser.setEmail("Tate.McRae@test.com"); requestUser.setActive(true);
+
+        String response = mockMvc.perform(post("/api/users") .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(requestUser)))
                 .andExpect(status().isCreated())
                 .andReturn()
                 .getResponse()
                 .getContentAsString();
+        UserDto created = objectMapper.readValue(response, UserDto.class);
+
+        CardDto card = new CardDto();
+        card.setUserId(created.getId());
+        card.setNumber("1234123442124215");
+        card.setHolder("Tate McRae");
+        card.setExpirationDate(LocalDate.of(2030, 1, 1));
+        card.setActive(true);
+
+        mockMvc.perform(post("/api/cards")
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(card)))
+                .andExpect(status().isCreated());
 
         mockMvc.perform(get("/api/cards")
                         .param("name", created.getName())
+                        .param("page", "0")
+                        .param("size", "10"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content").isArray())
+                .andExpect(jsonPath("$.totalElements").value(1));
+    }
+
+    @Test
+    @WithMockUser(roles = "USER")
+    void getAllCardsBySurname_returnsPage() throws Exception {
+
+        UserDto requestUser = new UserDto();
+        requestUser.setName("Sabrina");
+        requestUser.setSurname("Carpenter");
+        requestUser.setBirthDate(LocalDate.of(2000, 1, 1));
+        requestUser.setEmail("Sabrina.Carpenter@test.com"); requestUser.setActive(true);
+
+        String response = mockMvc.perform(post("/api/users") .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(requestUser)))
+                .andExpect(status().isCreated())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+        UserDto created = objectMapper.readValue(response, UserDto.class);
+
+        CardDto card = new CardDto();
+        card.setUserId(created.getId());
+        card.setNumber("1234123442124215");
+        card.setHolder("Sabrina Carpenter");
+        card.setExpirationDate(LocalDate.of(2030, 1, 1));
+        card.setActive(true);
+
+        mockMvc.perform(post("/api/cards")
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(card)))
+                .andExpect(status().isCreated());
+
+        mockMvc.perform(get("/api/cards")
                         .param("surname", created.getSurname())
                         .param("page", "0")
                         .param("size", "10"))

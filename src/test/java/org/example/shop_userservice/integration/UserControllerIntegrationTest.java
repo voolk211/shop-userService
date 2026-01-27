@@ -194,12 +194,73 @@ public class UserControllerIntegrationTest extends AbstractIntegrationTest {
 
         mockMvc.perform(get("/api/users")
                         .param("name", "John")
-                        .param("surname", "Doe") .param("page", "0")
-                        .param("size", "10")) .andExpect(status().isOk())
+                        .param("surname", "Doe")
+                        .param("page", "0")
+                        .param("size", "10"))
+                .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content").isArray())
                 .andExpect(jsonPath("$.content[0].id").value(created.getId()))
                 .andExpect(jsonPath("$.content[0].name").value("John"))
                 .andExpect(jsonPath("$.content[0].surname").value("Doe"))
                 .andExpect(jsonPath("$.totalElements").value(1));
     }
+
+    @Test @WithMockUser(roles = "USER")
+    void getAllUsers_byName_returnsPage() throws Exception {
+        UserDto requestUser = new UserDto();
+        requestUser.setName("Tate");
+        requestUser.setSurname("McRae");
+        requestUser.setBirthDate(LocalDate.of(2000, 1, 1));
+        requestUser.setEmail("Tate.McRae1@test.com"); requestUser.setActive(true);
+
+        String response = mockMvc.perform(post("/api/users") .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(requestUser)))
+                .andExpect(status().isCreated())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+        UserDto created = objectMapper.readValue(response, UserDto.class);
+
+        mockMvc.perform(get("/api/users")
+                        .param("name", "Tate")
+                        .param("page", "0")
+                        .param("size", "10"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content").isArray())
+                .andExpect(jsonPath("$.content[0].id").value(created.getId()))
+                .andExpect(jsonPath("$.content[0].name").value("Tate"))
+                .andExpect(jsonPath("$.content[0].surname").value("McRae"))
+                .andExpect(jsonPath("$.totalElements").value(1));
+    }
+
+    @Test @WithMockUser(roles = "USER")
+    void getAllUsers_bySurname_returnsPage() throws Exception {
+        UserDto requestUser = new UserDto();
+        requestUser.setName("Sabrina");
+        requestUser.setSurname("Carpenter");
+        requestUser.setBirthDate(LocalDate.of(2000, 1, 1));
+        requestUser.setEmail("Sabrina.Carpenter1@test.com"); requestUser.setActive(true);
+
+        String response = mockMvc.perform(post("/api/users") .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(requestUser)))
+                .andExpect(status().isCreated())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+        UserDto created = objectMapper.readValue(response, UserDto.class);
+
+        mockMvc.perform(get("/api/users")
+                        .param("surname", "carpenter")
+                        .param("page", "0")
+                        .param("size", "10"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content").isArray())
+                .andExpect(jsonPath("$.content[0].id").value(created.getId()))
+                .andExpect(jsonPath("$.content[0].name").value("Sabrina"))
+                .andExpect(jsonPath("$.content[0].surname").value("Carpenter"))
+                .andExpect(jsonPath("$.totalElements").value(1));
+    }
+
 }
