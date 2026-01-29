@@ -54,3 +54,15 @@ databaseChangeLog:
               - column:
                   name: updated_at
                   type: TIMESTAMP
+        - createIndex:
+            indexName: idx_users_name
+            tableName: users
+            columns:
+              - column:
+                  name: name
+        - createIndex:
+            indexName: idx_users_surname
+            tableName: users
+            columns:
+              - column:
+                  name: surname
