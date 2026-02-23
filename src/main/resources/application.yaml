@@ -1,0 +1,13 @@
+spring:
+  config:
+    import: optional:file:.env[.properties]
+  datasource:
+    driver-class-name: org.postgresql.Driver
+  liquibase:
+    enabled: true
+    change-log: classpath:liquibase/db.changelog.yaml
+  data:
+    redis:
+      timeout: 2000ms
+  cache:
+    type: redis
