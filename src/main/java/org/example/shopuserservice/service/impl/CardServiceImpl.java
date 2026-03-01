@@ -23,16 +23,11 @@ public class CardServiceImpl implements CardService {
     private final UserRepository userRepository;
     private final CacheManager cacheManager;
 
-    private Card getCardOrThrow(Long id) {
-        return cardRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Card not found"));
-    }
-
     @Transactional
     @Override
     public Card createCard(Card card) {
         if (!userRepository.existsById(card.getUser().getId())){
-            throw new IllegalStateException("User not exists");
+            throw new ResourceNotFoundException("User not exists.");
         }
         if (card.getId()!=null && cardRepository.existsById(card.getId())) {
             throw new IllegalStateException("Card already exists.");
@@ -96,6 +91,11 @@ public class CardServiceImpl implements CardService {
         Card card = getCardOrThrow(id);
         cardRepository.deleteById(id);
         evictCardAndUserCardCache(card.getUser().getId(), id);
+    }
+
+    private Card getCardOrThrow(Long id) {
+        return cardRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Card not found"));
     }
 
     private void evictCardAndUserCardCache(Long userId, Long cardId){

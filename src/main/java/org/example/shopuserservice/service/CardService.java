@@ -13,4 +13,5 @@ public interface CardService {
     Card patchCard(Long id, Boolean active);
 
     void deleteCard(Long cardId);
+
 }

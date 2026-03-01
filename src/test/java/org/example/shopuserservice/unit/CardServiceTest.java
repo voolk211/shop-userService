@@ -122,7 +122,7 @@ public class CardServiceTest {
     }
 
     @Test
-    void createCard_WhenCardIdAlreadyExists_ShouldThrowCardLimitException() {
+    void createCard_WhenCardIdAlreadyExists_ShouldThrowIllegalStateException() {
         Long cardId = 100L;
         Long userId = 1L;
 
@@ -146,7 +146,7 @@ public class CardServiceTest {
     }
 
     @Test
-    void createCard_WhenUserNotExists_ShouldThrowCardLimitException() {
+    void createCard_WhenUserNotExists_ShouldThrowResourceNotFoundException() {
         Long cardId = 100L;
         Long userId = 1L;
 
@@ -160,8 +160,8 @@ public class CardServiceTest {
         when(userRepository.existsById(user.getId())).thenReturn(false);
 
         assertThatThrownBy(() -> cardService.createCard(existingCard))
-                .isInstanceOf(IllegalStateException.class)
-                .hasMessage("User not exists");
+                .isInstanceOf(ResourceNotFoundException.class)
+                .hasMessage("User not exists.");
 
         verify(userRepository).existsById(user.getId());
         verify(cardRepository, never()).countByUserId(any());
@@ -169,7 +169,7 @@ public class CardServiceTest {
     }
 
     @Test
-    void createCard_WhenUserHasFiveCards_ShouldThrowIllegalArgumentException() {
+    void createCard_WhenUserHasFiveCards_ShouldThrowCardLimitException() {
         Long userId = 1L;
         User user = new User();
         user.setId(userId);
