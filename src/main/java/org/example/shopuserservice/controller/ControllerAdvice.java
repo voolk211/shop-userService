@@ -6,6 +6,7 @@ import org.example.shopuserservice.exception.ExceptionBody;
 import org.example.shopuserservice.exception.ResourceNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -21,6 +22,11 @@ public class ControllerAdvice {
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<ExceptionBody> handleResourceNotFound(ResourceNotFoundException e){
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ExceptionBody(e.getMessage()));
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<ExceptionBody> AccessDenied(AccessDeniedException e){
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new ExceptionBody(e.getMessage()));
     }
 
     @ExceptionHandler(IllegalStateException.class)

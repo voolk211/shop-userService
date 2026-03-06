@@ -11,7 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class CardSecurityServiceImpl implements CardSecurityService {
 
-    CardService cardService;
+    private final CardService cardService;
 
     @Transactional
     @Override

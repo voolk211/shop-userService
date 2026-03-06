@@ -7,16 +7,13 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
-
 @SpringBootApplication
 @EnableJpaAuditing
 @EnableMethodSecurity
 @EnableTransactionManagement
 @EnableCaching
 public class ShopUserServiceApplication {
-
     public static void main(String[] args) {
         SpringApplication.run(ShopUserServiceApplication.class, args);
     }
-
 }

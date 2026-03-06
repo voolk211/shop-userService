@@ -3,16 +3,14 @@ spring:
     import: optional:file:.env[.properties]
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: ${DATASOURCE_URL}
-    username: ${DATASOURCE_USERNAME}
-    password: ${DATASOURCE_PASSWORD}
   liquibase:
     enabled: true
     change-log: classpath:liquibase/db.changelog.yaml
   data:
     redis:
-      host: localhost
-      port: 6379
       timeout: 2000ms
   cache:
     type: redis
+internal:
+  service-secret: ${SERVICE_SECRET}
+  internal-secret: ${INTERNAL_SECRET}

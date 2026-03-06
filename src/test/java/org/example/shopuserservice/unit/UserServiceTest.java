@@ -6,27 +6,40 @@ import org.example.shopuserservice.model.entities.Card;
 import org.example.shopuserservice.model.entities.User;
 import org.example.shopuserservice.repository.CardRepository;
 import org.example.shopuserservice.repository.UserRepository;
+import org.example.shopuserservice.service.UserPersistenceService;
 import org.example.shopuserservice.service.impl.UserServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 
-import static org.assertj.core.api.Assertions.*;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatCode;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
-
-import java.time.LocalDate;
-import java.util.*;
-
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.anyLong;
+import static org.mockito.Mockito.anyBoolean;
+import static org.mockito.Mockito.times;
+
+import java.util.HashSet;
+import java.util.Set;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Optional;
+import java.time.LocalDate;
 
 @ExtendWith(MockitoExtension.class)
 public class UserServiceTest {
@@ -39,6 +52,9 @@ public class UserServiceTest {
 
     @InjectMocks
     private UserServiceImpl userService;
+
+    @Mock
+    private UserPersistenceService userPersistenceService;
 
     @Test
     void createUser_WhenEmailIsUnique_ShouldSaveAndReturnUser(){
@@ -403,6 +419,110 @@ public class UserServiceTest {
 
         assertThat(result.getContent()).hasSize(0);
         verify(cardRepository).findAll(any(Specification.class), eq(pageable));
+    }
+
+    @Test
+    void createUserIdempotent_WhenUserIsNew_ShouldSaveUser() {
+        String email = "new@test.com";
+        User user = new User("Bob", "Dylan", LocalDate.now(), email, true);
+
+        User savedUser = new User("Bob", "Dylan", LocalDate.now(), email, true);
+        savedUser.setId(1L);
+
+        when(userPersistenceService.saveUser(user)).thenReturn(savedUser);
+
+        User result = userService.createUserIdempotent(user);
+
+        assertThat(result.getId()).isEqualTo(1L);
+        assertThat(result.getEmail()).isEqualTo(email);
+
+        verify(userPersistenceService).saveUser(user);
+        verify(userRepository, never()).findByEmail(anyString());
+    }
+
+    @Test
+    void createUserIdempotent_WhenDuplicateEmail_ShouldReturnExistingUser() {
+        String email = "duplicate@test.com";
+        User user = new User("Bob", "Dylan", LocalDate.now(), email, true);
+
+        User existingUser = new User("Bob", "Dylan", LocalDate.now(), email, true);
+        existingUser.setId(5L);
+
+        when(userPersistenceService.saveUser(user))
+                .thenThrow(new DataIntegrityViolationException("duplicate"));
+        when(userRepository.findByEmail(email))
+                .thenReturn(Optional.of(existingUser));
+
+        User result = userService.createUserIdempotent(user);
+
+        assertThat(result.getId()).isEqualTo(5L);
+        assertThat(result.getEmail()).isEqualTo(email);
+
+        verify(userPersistenceService).saveUser(user);
+        verify(userRepository).findByEmail(email);
+    }
+
+    @Test
+    void createUserIdempotent_WhenDuplicateAndUserNotFound_ShouldThrowException() {
+        String email = "duplicate@test.com";
+        User user = new User("Bob", "Dylan", LocalDate.now(), email, true);
+
+        when(userPersistenceService.saveUser(user))
+                .thenThrow(new DataIntegrityViolationException("duplicate"));
+        when(userRepository.findByEmail(email))
+                .thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> userService.createUserIdempotent(user))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("User exists but retrieval failed");
+
+        verify(userPersistenceService).saveUser(user);
+        verify(userRepository).findByEmail(email);
+    }
+
+    @Test
+    void saveUser_ShouldCallSaveAndFlush() {
+        User user = new User("Bob", "Dylan", LocalDate.now(), "test@test.com", true);
+        user.setId(1L);
+
+        when(userRepository.saveAndFlush(user)).thenReturn(user);
+
+        User result = userService.saveUser(user);
+
+        assertThat(result).isEqualTo(user);
+        verify(userRepository).saveAndFlush(user);
+    }
+
+    @Test
+    void deleteUserIdempotent_WhenUserExists_ShouldDeleteUser() {
+        Long id = 5L;
+
+        userService.deleteUserIdempotent(id);
+
+        verify(userRepository).deleteById(id);
+    }
+
+    @Test
+    void deleteUserIdempotent_WhenUserDoesNotExist_ShouldNotThrowException() {
+        Long id = 999L;
+
+        assertThatCode(() -> userService.deleteUserIdempotent(id))
+                .doesNotThrowAnyException();
+
+        verify(userRepository).deleteById(id);
+    }
+
+    @Test
+    void deleteUserIdempotent_ShouldBeIdempotent_WhenCalledMultipleTimes() {
+        Long id = 10L;
+
+        assertThatCode(() -> {
+            userService.deleteUserIdempotent(id);
+            userService.deleteUserIdempotent(id);
+            userService.deleteUserIdempotent(id);
+        }).doesNotThrowAnyException();
+
+        verify(userRepository, times(3)).deleteById(id);
     }
 
 }

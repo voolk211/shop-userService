@@ -6,16 +6,19 @@ import org.example.shopuserservice.model.entities.Card;
 import org.example.shopuserservice.model.entities.User;
 import org.example.shopuserservice.repository.CardRepository;
 import org.example.shopuserservice.repository.UserRepository;
+import org.example.shopuserservice.service.UserPersistenceService;
 import org.example.shopuserservice.service.UserService;
 import org.example.shopuserservice.specification.CardSpecification;
 import org.example.shopuserservice.specification.UserSpecification;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -26,6 +29,8 @@ public class UserServiceImpl implements UserService {
 
     private final CardRepository cardRepository;
     private final UserRepository userRepository;
+
+    private final UserPersistenceService userPersistenceService;
 
     private User getUserOrThrow(Long id) {
         return userRepository.findById(id)
@@ -43,6 +48,24 @@ public class UserServiceImpl implements UserService {
             throw new IllegalStateException("Email already in use");
         }
         return userRepository.save(user);
+    }
+
+    @Override
+    public User createUserIdempotent(User user) {
+        try {
+            return userPersistenceService.saveUser(user);
+        } catch (DataIntegrityViolationException e) {
+            return userRepository.findByEmail(user.getEmail())
+                    .orElseThrow(() ->
+                            new IllegalStateException("User exists but retrieval failed", e)
+                    );
+        }
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @Override
+    public User saveUser(User user) {
+        return userRepository.saveAndFlush(user);
     }
 
     @Transactional(readOnly = true)
@@ -125,6 +148,17 @@ public class UserServiceImpl implements UserService {
         if (!userRepository.existsById(id)) {
             throw new ResourceNotFoundException("User not found");
         }
+        userRepository.deleteById(id);
+    }
+
+
+    @Transactional
+    @Override
+    @Caching(evict = {
+            @CacheEvict(value = "UserService::getUserById", key = "#id"),
+            @CacheEvict(value = "UserService::getCardsByUserId", key = "#id")
+    })
+    public void deleteUserIdempotent(Long id){
         userRepository.deleteById(id);
     }
 }
