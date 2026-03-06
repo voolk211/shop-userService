@@ -25,7 +25,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @TestPropertySource(properties = {
         "internal.service-secret=test-secret",
-        "internal.service-secret=test-secret"
+        "internal.internal-secret=test-secret"
 })
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 public class InternalUserControllerIntegrationTest extends AbstractIntegrationTest {

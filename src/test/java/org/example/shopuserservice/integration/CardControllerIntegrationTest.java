@@ -26,7 +26,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 
 @TestPropertySource(properties = {
-        "internal.internal-secret=test-secret",
+        "internal.service-secret=test-secret",
         "internal.internal-secret=test-secret"
 })
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
