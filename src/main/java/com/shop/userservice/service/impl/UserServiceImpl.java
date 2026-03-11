@@ -1,0 +1,167 @@
+package com.shop.userservice.service.impl;
+
+import lombok.RequiredArgsConstructor;
+import com.shop.userservice.exception.ResourceNotFoundException;
+import com.shop.userservice.model.entities.Card;
+import com.shop.userservice.model.entities.User;
+import com.shop.userservice.repository.CardRepository;
+import com.shop.userservice.repository.UserRepository;
+import com.shop.userservice.service.UserPersistenceService;
+import com.shop.userservice.service.UserService;
+import com.shop.userservice.specification.CardSpecification;
+import com.shop.userservice.specification.UserSpecification;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+
+@Service
+@RequiredArgsConstructor
+public class UserServiceImpl implements UserService {
+
+    private final CardRepository cardRepository;
+    private final UserRepository userRepository;
+
+    private final UserPersistenceService userPersistenceService;
+
+    @Transactional
+    @Override
+    public User createUser(User user) {
+        if (user.getId() != null && userRepository.existsById(user.getId())){
+            throw new IllegalStateException("User already exists.");
+        }
+        if (user.getEmail() != null && userRepository.existsByEmail(user.getEmail())){
+            throw new IllegalStateException("Email already in use");
+        }
+        return userRepository.save(user);
+    }
+
+    @Transactional
+    @Override
+    public User createUserIdempotent(User user) {
+        try {
+            return userPersistenceService.saveUser(user);
+        }
+        catch (DataIntegrityViolationException e) {
+            if (isDuplicateEmail(e)) {
+                return userRepository.findByEmail(user.getEmail())
+                        .orElseThrow(() ->
+                                new IllegalStateException("User exists but retrieval failed", e)
+                        );
+            }
+            throw e;
+        }
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @Override
+    public User saveUser(User user) {
+        return userRepository.saveAndFlush(user);
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    @Cacheable(value = "UserService::getUserById", key = "#id")
+    public User getUserById(Long id) {
+        return getUserOrThrow(id);
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public Page<User> getAllUsersByNameAndSurname(Pageable pageable, String name, String surname) {
+        Specification<User> spec = Specification
+                .where(UserSpecification.hasName(name))
+                .and(UserSpecification.hasSurname(surname));
+        return userRepository.findAll(spec, pageable);
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public Page<Card> getAllCardsByUserNameAndSurname(Pageable pageable, String name, String surname) {
+        Specification<Card> spec = Specification
+                .where(CardSpecification.cardUserHasName(name))
+                .and(CardSpecification.cardUserHasSurname(surname));
+        return cardRepository.findAll(spec, pageable);
+    }
+
+    @Transactional
+    @Override
+    @CacheEvict(value = "UserService::getUserById", key = "#user.id")
+    public User updateUser(User user) {
+        User currentUser = getUserOrThrow(user.getId());
+        if (user.getEmail() != null && userRepository.existsByEmail(user.getEmail()) && !(currentUser.getEmail().equals(user.getEmail()))) {
+            throw new IllegalStateException("Email already in use");
+        }
+        if (user.getEmail() != null) {
+            currentUser.setEmail(user.getEmail());
+        }
+        if (user.getName() != null) {
+            currentUser.setName(user.getName());
+        }
+        if (user.getSurname() != null) {
+            currentUser.setSurname(user.getSurname());
+        }
+        if (user.getBirthDate() != null) {
+            currentUser.setBirthDate(user.getBirthDate());
+        }
+        if (user.getActive() != null) {
+            currentUser.setActive(user.getActive());
+        }
+        return userRepository.save(currentUser);
+    }
+
+    @Transactional
+    @Override
+    @CacheEvict(value = "UserService::getUserById", key = "#id")
+    public User patchUser(Long id, Boolean active) {
+        if (!userRepository.existsById(id)) {
+            throw new ResourceNotFoundException("User not found");
+        }
+        userRepository.setActiveById(id, active);
+        return getUserOrThrow(id);
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    @Cacheable(value = "UserService::getCardsByUserId", key = "#id")
+    public List<Card> getCardsByUserId(Long id) {
+        User user = getUserOrThrow(id);
+        return user.getCards();
+    }
+
+    @Transactional
+    @Override
+    @Caching(evict = {
+        @CacheEvict(value = "UserService::getUserById", key = "#id"),
+        @CacheEvict(value = "UserService::getCardsByUserId", key = "#id")
+    })
+    public void deleteUser(Long id) {
+        if (!userRepository.existsById(id)) {
+            throw new ResourceNotFoundException("User not found");
+        }
+        userRepository.deleteById(id);
+    }
+
+    private User getUserOrThrow(Long id) {
+        return userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User not found"));
+    }
+
+    private boolean isDuplicateEmail(DataIntegrityViolationException ex) {
+        Throwable cause = ex.getCause();
+
+        if (cause instanceof org.hibernate.exception.ConstraintViolationException cve) {
+            return "uk_users_email".equals(cve.getConstraintName());
+        }
+
+        return false;
+    }
+
+}
