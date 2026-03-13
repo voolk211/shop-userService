@@ -1,9 +1,21 @@
+server:
+  port: ${USER_SERVICE_PORT}
 spring:
   datasource:
-    url: jdbc:postgresql://postgres:5432/postgres
+    url: ${SPRING_DATASOURCE_URL}
     username: ${SPRING_DATASOURCE_USERNAME}
     password: ${SPRING_DATASOURCE_PASSWORD}
   data:
     redis:
-      host: redis_docker
-      port: 6379
+      host: ${SPRING_REDIS_HOST:redis}
+      port: ${SPRING_REDIS_PORT:6379}
+internal:
+  service-secret: ${SERVICE_SECRET}
+  internal-secret: ${INTERNAL_SECRET}
+gateway:
+  url: http://localhost:8080
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+  api-docs:
+    path: /v3/api-docs

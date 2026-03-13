@@ -14,7 +14,6 @@ databaseChangeLog:
               - column:
                   name: id
                   type: BIGINT
-                  autoIncrement: true
                   constraints:
                     primaryKey: true
                     nullable: false
@@ -54,6 +53,10 @@ databaseChangeLog:
               - column:
                   name: updated_at
                   type: TIMESTAMP
+              - addUniqueConstraint:
+                  tableName: users
+                  columnNames: email
+                  constraintName: uk_users_email
         - createIndex:
             indexName: idx_users_name
             tableName: users

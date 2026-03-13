@@ -11,3 +11,6 @@ spring:
       timeout: 2000ms
   cache:
     type: redis
+internal:
+  service-secret: ${SERVICE_SECRET}
+  internal-secret: ${INTERNAL_SECRET}
