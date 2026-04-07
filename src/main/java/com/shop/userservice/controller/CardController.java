@@ -41,7 +41,7 @@ public class CardController {
         return ResponseEntity.ok(cardMapper.toDto(card));
     }
 
-    @PreAuthorize("hasRole('ADMIN') or #cardDto.userId == authentication.principal")
+    @PreAuthorize("hasRole('ADMIN') or #cardDto.userId.equals(authentication.principal)")
     @PostMapping
     public ResponseEntity<CardDto> createCard(@Valid @RequestBody CardDto cardDto) {
         Card card = cardService.createCard(cardMapper.toEntity(cardDto));

@@ -39,7 +39,7 @@ public class UserController {
     private final CardMapper cardMapper;
 
 
-    @PreAuthorize("hasRole('ADMIN') or #id == authentication.principal")
+    @PreAuthorize("hasRole('ADMIN') or #id.equals(authentication.principal)")
     @GetMapping("/{id}")
     public ResponseEntity<UserDto> getUserById(@PathVariable Long id) {
         User user = userService.getUserById(id);
@@ -53,7 +53,7 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.CREATED).body(userMapper.toDto(user));
     }
 
-    @PreAuthorize("hasRole('ADMIN') or #id == authentication.principal")
+    @PreAuthorize("hasRole('ADMIN') or #id.equals(authentication.principal)")
     @PutMapping("/{id}")
     public ResponseEntity<UserDto> updateUser(@Valid @RequestBody UserDto userDto, @PathVariable Long id) {
         if (userDto.getId() != null && !userDto.getId().equals(id)) {
@@ -64,14 +64,14 @@ public class UserController {
         return ResponseEntity.ok(userMapper.toDto(user));
     }
 
-    @PreAuthorize("hasRole('ADMIN') or #id == authentication.principal")
+    @PreAuthorize("hasRole('ADMIN') or #id.equals(authentication.principal)")
     @GetMapping("/{id}/cards")
     public ResponseEntity<List<CardDto>> getCardsByUserId(@PathVariable Long id) {
         List<Card> cards = userService.getCardsByUserId(id);
         return ResponseEntity.ok(cardMapper.toDto(cards));
     }
 
-    @PreAuthorize("hasRole('ADMIN') or #id == authentication.principal")
+    @PreAuthorize("hasRole('ADMIN') or #id.equals(authentication.principal)")
     @PatchMapping("/{id}")
     public ResponseEntity<UserDto> patchUser(@Valid @RequestBody UserPatchDto userPatchDto, @PathVariable Long id) {
         User user = userService.patchUser(id, userPatchDto.getActive());
@@ -89,7 +89,7 @@ public class UserController {
         return ResponseEntity.ok(userMapper.toDto(users));
     }
 
-    @PreAuthorize("hasRole('ADMIN') or #id == authentication.principal")
+    @PreAuthorize("hasRole('ADMIN') or #id.equals(authentication.principal)")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteUserById(@PathVariable Long id) {
         userService.deleteUser(id);
