@@ -32,7 +32,9 @@ public class GatewayAuthFilter extends OncePerRequestFilter {
         if (path.startsWith("/swagger-ui") ||
                 path.startsWith("/v3/api-docs") ||
                 path.startsWith("/swagger") ||
-                path.startsWith("/api/internal/")) {
+                path.startsWith("/api/internal/") ||
+                path.startsWith("/actuator/health/liveness") ||
+                path.startsWith("/actuator/health/readiness")) {
             filterChain.doFilter(request, response);
             return;
         }
